@@ -19,8 +19,8 @@ jobs:
 
       - name: Verify Key and Password
         run: |
-          # Write the private key to a temporary file
-          printf "%s" "${{ secrets.COSIGN_KEY }}" > temp.key
+          # The shell will safely write the multiline env var to a file
+          echo "$COSIGN_KEY_DATA" > temp.key
           
           # 1. Test key derivation
           cosign public-key --key temp.key
@@ -31,3 +31,4 @@ jobs:
           cosign verify-blob --key cosign.pub --bundle test.bundle test.txt
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          COSIGN_KEY_DATA: ${{ secrets.COSIGN_KEY }}
