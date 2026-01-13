@@ -17,17 +17,35 @@ jobs:
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3.1.1
 
-      - name: Verify Key and Password
+      - name: Test key derivation
         run: |
           # The shell will safely write the multiline env var to a file
           echo "$COSIGN_KEY_DATA" > temp.key
           
           # 1. Test key derivation
           cosign public-key --key temp.key
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          COSIGN_KEY_DATA: ${{ secrets.COSIGN_KEY }}
+
+      - name: Test actual signing
+        run: |
+          # The shell will safely write the multiline env var to a file
+          echo "$COSIGN_KEY_DATA" > temp.key
           
-          # 2. Test actual signing and verification
+          # 2. Test actual signing
           echo "test-data" > test.txt
           cosign sign-blob --key temp.key --bundle test.bundle test.txt
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+          COSIGN_KEY_DATA: ${{ secrets.COSIGN_KEY }}
+
+      - name: Test Verification
+        run: |
+          # The shell will safely write the multiline env var to a file
+          echo "$COSIGN_KEY_DATA" > temp.key
+          
+          # 3. Test verification
           cosign verify-blob --key cosign.pub --bundle test.bundle test.txt
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
