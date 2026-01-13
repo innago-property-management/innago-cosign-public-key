@@ -1,0 +1,33 @@
+name: verify
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+on:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Cosign
+        uses: sigstore/cosign-installer@v3.1.1
+
+      - name: Verify Key and Password
+        run: |
+          # Write the private key to a temporary file
+          printf "%s" "${{ secrets.COSIGN_KEY }}" > temp.key
+          
+          # 1. Test key derivation
+          cosign public-key --key temp.key
+          
+          # 2. Test actual signing and verification
+          echo "test-data" > test.txt
+          cosign sign-blob --key temp.key --bundle test.bundle test.txt
+          cosign verify-blob --key cosign.pub --bundle test.bundle test.txt
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
