@@ -1,2 +1,6 @@
 .cosign-password.txt
 cosign.key
+cosign.key.base64
+test.bundle
+test.txt
+test.txt.cosign.bundle

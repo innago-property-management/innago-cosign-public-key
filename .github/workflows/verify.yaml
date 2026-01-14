@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install Cosign
-        uses: sigstore/cosign-installer@v3.1.1
+        uses: sigstore/cosign-installer@v4.0.0  # v4 installs cosign v3.x (v3.x installs cosign v2.x)
 
       - name: Test key derivation
         run: |
@@ -32,10 +32,10 @@ jobs:
         run: |
           # The shell will safely write the multiline env var to a file
           echo "$COSIGN_KEY_DATA" > temp.key
-          
+
           # 2. Test actual signing
           echo "test-data" > test.txt
-          cosign sign-blob --key temp.key --bundle test.bundle test.txt
+          cosign sign-blob --key temp.key --bundle test.bundle --yes=true test.txt
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_KEY_DATA: ${{ secrets.COSIGN_KEY }}
