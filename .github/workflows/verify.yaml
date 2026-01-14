@@ -32,10 +32,10 @@ jobs:
         run: |
           # The shell will safely write the multiline env var to a file
           echo "$COSIGN_KEY_DATA" > temp.key
-          
+
           # 2. Test actual signing
           echo "test-data" > test.txt
-          cosign sign-blob --key temp.key --bundle test.bundle test.txt
+          cosign sign-blob --key temp.key --bundle test.bundle --yes=true test.txt
         env:
           COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
           COSIGN_KEY_DATA: ${{ secrets.COSIGN_KEY }}
